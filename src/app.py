@@ -264,7 +264,5 @@ def create_app():
         return render_template('ranking.html', users=users)
     return app
 
-if __name__ == '__main__':
-    app=create_app()
-    app.run(debug=False)
+
     
