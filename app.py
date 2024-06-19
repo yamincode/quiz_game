@@ -263,5 +263,5 @@ def ranking():
     return render_template('ranking.html', users=users)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
     
