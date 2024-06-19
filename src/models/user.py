@@ -1,6 +1,6 @@
 # models/user.py
 
-from src.app import db
+from src.create_db import db
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
 class User(db.Model,UserMixin):
