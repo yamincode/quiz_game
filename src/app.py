@@ -21,8 +21,8 @@ app.config['SECRET_KEY'] = 'your_secret_key'
 
 db = SQLAlchemy(app)
 
-from models.trivia import Trivia
-from models.user import User
+from src.models.trivia import Trivia
+from src.models.user import User
 
 # class User(db.Model,UserMixin):
 #     id = db.Column(db.Integer, primary_key=True)

@@ -1,6 +1,6 @@
 # models/trivia.py
 
-from app import db
+from src.app import db
 
 class Trivia(db.Model):
     id = db.Column(db.Integer, primary_key=True)
