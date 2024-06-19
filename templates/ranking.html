@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Leaderboard - Trivia App{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Leaderboard</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Username</th>
+                <th>Easy Correct</th>
+                <th>Medium Correct</th>
+                <th>Hard Correct</th>
+                <th>Total Questions Answered</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.easy_correct }}</td>
+                <td>{{ user.medium_correct }}</td>
+                <td>{{ user.hard_correct }}</td>
+                <td>{{ user.total_questions }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('index') }}" class="btn btn-primary">Back to Home</a>
+</div>
+{% endblock %}

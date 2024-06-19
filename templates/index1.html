@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}Home - Trivia App{% endblock %}
+{% block content %}
+<h1 class="text-center">Trivia App</h1>
+{% if current_user.is_authenticated %}
+<script>
+    let score = 0;
+    
+    function loadTrivia() {
+        fetch('/trivia')
+            .then(response => response.json())
+            .then(data => {
+                const triviaContainer = document.getElementById('trivia-questions');
+                triviaContainer.innerHTML = '';
+                data.forEach(item => {
+                    const questionElem = document.createElement('div');
+                    questionElem.className = 'card mt-3';
+                    questionElem.innerHTML = `
+                        <div class="card-body">
+                            <h5 class="card-title">${item.question}</h5>
+                            <p class="card-text"><strong>Category:</strong> ${item.category}</p>
+                            <p class="card-text"><strong>Difficulty:</strong> ${item.difficulty}</p>
+                            <p class="card-text"><strong>Correct Answer:</strong> ${item.correct_answer}</p>
+                            <p class="card-text"><strong>Incorrect Answers:</strong> ${item.incorrect_answers.join(', ')}</p>
+                        </div>
+                    `;
+                    triviaContainer.appendChild(questionElem);
+                });
+            });
+        }
+
+    function startGame() {
+        document.getElementById('game-area').style.display = 'block';
+        fetchTrivia();
+        fetchQuestion();
+    }
+    function fetchTrivia() {
+            fetch('/fetch_trivia', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('message').innerText = data.message;
+                //loadTrivia();
+            });
+        }
+
+
+    function fetchQuestion() {  
+        fetch('/get_question',{
+                method: 'GET'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('feedback').innerText = data.error;
+                } else {
+                    displayQuestion(data);
+                }
+            });
+    }
+    function displayQuestion(question) {
+        const questionText = document.getElementById('question-text');
+        const answerOptions = document.getElementById('answer-options');
+        questionText.innerHTML = question.question;
+
+        answerOptions.innerHTML = '';
+
+        let answers = question.incorrect_answers;
+        answers.push(question.correct_answer)
+        answers = answers.sort(() => Math.random() - 0.5);
+
+        answers.forEach(answer => {
+            const div = document.createElement('div');
+            div.className = 'form-check';
+            const input = document.createElement('input');
+            input.className = 'form-check-input';
+            input.type = 'radio';
+            input.name = 'answer';
+            input.value = answer;
+            input.id = answer;
+            const label = document.createElement('label');
+            label.className = 'form-check-label';
+            label.htmlFor = answer;
+            label.innerText = answer;
+            div.appendChild(input);
+            div.appendChild(label);
+            answerOptions.appendChild(div);
+        });
+
+        questionText.dataset.id = question.id;
+    }
+
+function submitAnswer(event) {
+    event.preventDefault();
+
+    const selectedAnswer = document.querySelector('input[name="answer"]:checked').value;
+    const questionId = document.getElementById('question-text').dataset.id;
+
+    fetch('/check_answer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            question_id: questionId,
+            user_answer: selectedAnswer
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.result === 'correct') {
+            score++;
+            document.getElementById('feedback').innerText = 'Correct! Your score: ' + score;
+        } else {
+            document.getElementById('feedback').innerText = 'Incorrect. The correct answer was: ' + data.correct_answer + '. Your score: ' + score;
+        }
+        fetchQuestion();
+    });
+}
+</script>
+<div class="mt-3 text-center">
+    <button class="btn btn-primary" onclick="startGame()">Start Game</button>  
+</div>
+<div id="game-area" class="mt-5" style="display: none;">
+    <div id="question-card" class="card mt-3">
+        <div class="card-body">
+            <h5 id="question-text" class="card-title"></h5>
+            <form id="answer-form" onsubmit="submitAnswer(event)">
+                <div id="answer-options" class="form-group"></div>
+                <button type="submit" class="btn btn-primary">Submit Answer</button>
+            </form>
+        </div>
+    </div>
+    <div id="feedback" class="mt-3"></div>
+</div>
+{% else %}
+<p class="text-center">Please <a href="{{ url_for('login') }}">log in</a> to play the game.</p>
+{% endif %}
+{% endblock %}
+
+
+
